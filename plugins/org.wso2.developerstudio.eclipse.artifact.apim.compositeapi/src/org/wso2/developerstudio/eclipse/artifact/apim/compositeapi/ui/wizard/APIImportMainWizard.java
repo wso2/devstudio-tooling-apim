@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.eclipse.artifact.ui.wizard;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard;
 
 import java.io.File;
 import java.io.FileOutputStream;

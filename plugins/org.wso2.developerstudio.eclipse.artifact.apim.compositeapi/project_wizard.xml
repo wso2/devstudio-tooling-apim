@@ -12,7 +12,7 @@
 				  title="Composite API" 
 				  description="Create a new Composite API" 
 				  error="Please give a name to the composite API">
-			<data modelProperty="project.name" type="string" fieldController="org.wso2.developerstudio.eclipse.artifact.validators.CompositeApiProjectFieldController">Composite API Name*</data>	  
+			<data modelProperty="project.name" type="string" fieldController="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.validators.CompositeApiProjectFieldController">Composite API Name*</data>	  
 	
 			<projectNatures>
 				<nature>org.eclipse.jdt.core.javanature</nature>
@@ -22,8 +22,8 @@
 				  title="Composite API" 
 				  description="Import existing composite API artifact" 
 				  error="Browse and select an existing composite API artifact">
-			<data modelProperty="project.name" type="string" fieldController="org.wso2.developerstudio.eclipse.artifact.validators.CompositeApiProjectFieldController">Composite API Name*</data>
-			<data modelProperty="project.location" type="dir" filter="server" fieldController="org.wso2.developerstudio.eclipse.artifact.validators.CompositeApiProjectFieldController">Deployment Server Location*</data>
+			<data modelProperty="project.name" type="string" fieldController="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.validators.CompositeApiProjectFieldController">Composite API Name*</data>
+			<data modelProperty="project.location" type="dir" filter="server" fieldController="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.validators.CompositeApiProjectFieldController">Deployment Server Location*</data>
 			<projectNatures>
 				<nature>org.eclipse.jdt.core.javanature</nature>
 			</projectNatures>

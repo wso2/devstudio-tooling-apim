@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.wso2.developerstudio.eclipse.artifact.template;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.template;
 
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
-import org.wso2.developerstudio.eclipse.artifact.Activator;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 
 public class CustomArtifactClassTemplate {
 

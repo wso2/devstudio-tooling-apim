@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.eclipse.artifact.ui.wizard;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeAPIUtils;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeAPIUtils;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 

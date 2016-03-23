@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.eclipse.artifact.utils;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

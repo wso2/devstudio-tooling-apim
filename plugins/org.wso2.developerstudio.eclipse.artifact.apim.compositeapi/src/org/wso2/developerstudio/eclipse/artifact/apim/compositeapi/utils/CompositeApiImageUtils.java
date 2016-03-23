@@ -1,8 +1,8 @@
-package org.wso2.developerstudio.eclipse.artifact.utils;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils;
 
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
-import org.wso2.developerstudio.eclipse.artifact.Activator;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 import org.wso2.developerstudio.eclipse.utils.ui.ImageUtils;
 
 public class CompositeApiImageUtils extends ImageUtils {

@@ -1,10 +1,10 @@
-package org.wso2.developerstudio.eclipse.artifact.validators;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.validators;
 
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
 import org.wso2.developerstudio.eclipse.platform.core.exception.FieldValidationException;
 import org.wso2.developerstudio.eclipse.platform.core.model.AbstractFieldController;
 import org.wso2.developerstudio.eclipse.platform.core.project.model.ProjectDataModel;

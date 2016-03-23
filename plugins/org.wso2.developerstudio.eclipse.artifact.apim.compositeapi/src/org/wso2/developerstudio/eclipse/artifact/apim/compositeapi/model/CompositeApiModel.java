@@ -1,8 +1,8 @@
-package org.wso2.developerstudio.eclipse.artifact.model;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model;
 
 import java.io.File;
 
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
 import org.wso2.developerstudio.eclipse.platform.core.exception.ObserverFailedException;
 import org.wso2.developerstudio.eclipse.platform.core.project.model.ProjectDataModel;
 
