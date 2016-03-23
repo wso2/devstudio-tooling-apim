@@ -39,3 +39,5 @@ Import-Package: org.apache.commons.codec.binary;version="1.6.0",
  org.wso2.developerstudio.eclipse.utils.ui;version="4.0.0"
 Bundle-ClassPath: lib/json_2.0.0.wso2v1.jar,
  .
+Export-Package: org.wso2.developerstudio.eclipse.artifact.ui.wizard,
+ org.wso2.developerstudio.eclipse.artifact.utils
