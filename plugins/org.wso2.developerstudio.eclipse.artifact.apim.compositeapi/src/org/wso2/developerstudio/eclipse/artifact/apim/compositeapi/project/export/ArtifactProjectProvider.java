@@ -1,9 +1,9 @@
-package org.wso2.developerstudio.eclipse.artifact.project.export;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.export;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.wso2.developerstudio.eclipse.artifact.Activator;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 import org.wso2.developerstudio.eclipse.distribution.project.export.CappArtifactsListProvider;
 import org.eclipse.core.resources.IProject;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;

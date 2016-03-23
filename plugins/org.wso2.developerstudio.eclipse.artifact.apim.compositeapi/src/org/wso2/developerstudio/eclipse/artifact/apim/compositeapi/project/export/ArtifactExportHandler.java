@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.developerstudio.eclipse.artifact.project.export;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.export;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.wso2.developerstudio.eclipse.platform.core.project.export.ProjectArti
 import org.wso2.developerstudio.eclipse.utils.archive.ArchiveManipulator;
 import org.wso2.developerstudio.eclipse.utils.file.FileUtils;
 import org.wso2.developerstudio.eclipse.logging.core.*;
-import org.wso2.developerstudio.eclipse.artifact.Activator;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 import org.wso2.developerstudio.eclipse.maven.util.MavenUtils;
 
 public class ArtifactExportHandler extends ProjectArtifactHandler {

@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.newWizards">
          <wizard name="Composite API" category="org.wso2.developerstudio.eclipse.capp.project/org.wso2.developerstudio.eclipse.artifact.apim.category"
-			class="org.wso2.developerstudio.eclipse.artifact.ui.wizard.CompositeApiProjectCreationWizard"
+			class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard.CompositeApiProjectCreationWizard"
 			wizardManifest="project_wizard.xml"
 			id="org.wso2.developerstudio.eclipse.artifact.newCompositeApiProject"
 			project="true"
@@ -20,7 +20,7 @@
    <extension point="org.eclipse.ui.newWizards">
          <wizard name="Import APIs to create composite API"
 			category="org.wso2.developerstudio.eclipse.capp.project/org.wso2.developerstudio.eclipse.extensions/org.wso2.developerstudio.eclipse.extensions.project.types"
-			class="org.wso2.developerstudio.eclipse.artifact.ui.wizard.APIImportMainWizard"
+			class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard.APIImportMainWizard"
 			id="org.wso2.developerstudio.eclipse.artifact.addcompositeapitoworkspace"
 			icon="icons/new-mediator-16x16.png">
 			<description>Import APIs to create composite API</description>
@@ -55,7 +55,7 @@
 		id="org.wso2.developerstudio.eclipse.artifact.project.nature" name="PROJECT_NATURE">
 		<runtime>
 			<run
-				class="org.wso2.developerstudio.eclipse.artifact.project.nature.CompositeApiProjectNature">
+				class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.nature.CompositeApiProjectNature">
 			</run>
 		</runtime>
 	</extension>
@@ -65,7 +65,7 @@
 	               <action
 	                        label="Import APIs from Store"
 	                        icon="icons/car.png"
-	                   class="org.wso2.developerstudio.eclipse.artifact.ImportAPIAction"
+	                   class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ImportAPIAction"
 	                        id="org.wso2.developerstudio.eclipse.apim.project.ui.action.storeapiimport">
 	               </action>
 	               <enablement>
@@ -81,7 +81,7 @@
 
 	<extension point="org.eclipse.ui.ide.projectNatureImages">
 		<image id="org.wso2.developerstudio.eclipse.artifact.project.natureImage"
-			natureId="org.wso2.developerstudio.eclipse.artifact.project.nature" icon="icons/new-mediator-12x12.png">
+			natureId="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.nature" icon="icons/new-mediator-12x12.png">
 		</image>
 	</extension>
     

@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.eclipse.artifact.project.nature;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.nature;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -8,9 +8,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.wso2.developerstudio.eclipse.artifact.Activator;
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiConstants;
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiMavenConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiMavenConstants;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.maven.util.MavenUtils;

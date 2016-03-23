@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.eclipse.artifact.ui.wizard;
+package org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,9 +12,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.wso2.developerstudio.eclipse.maven.util.MavenUtils;
 import org.wso2.developerstudio.eclipse.platform.ui.wizard.AbstractWSO2ProjectCreationWizard;
 import org.wso2.developerstudio.eclipse.utils.project.ProjectUtils;
-import org.wso2.developerstudio.eclipse.artifact.model.CompositeApiModel;
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiConstants;
-import org.wso2.developerstudio.eclipse.artifact.utils.CompositeApiImageUtils;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.CompositeApiModel;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiImageUtils;
 
 public class CompositeApiProjectCreationWizard extends AbstractWSO2ProjectCreationWizard {
 	private CompositeApiModel compositeApiModel;
