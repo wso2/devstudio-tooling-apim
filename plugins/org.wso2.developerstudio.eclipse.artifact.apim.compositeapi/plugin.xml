@@ -84,6 +84,58 @@
 			natureId="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.nature" icon="icons/new-mediator-12x12.png">
 		</image>
 	</extension>
+	
+	<extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.perspective.PerspectiveFactory"
+            id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi"
+            name="CompositeAPI"/>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="CompositeAPI"
+            id="com.packtpub.e4.clock.ui">
+      </category>
+      <view
+			category="compositeAPI"
+			class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.views.TimeZoneTreeView"
+			icon="icons/sample.gif"
+			id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.views.TimeZoneTreeView"
+			name="Composite Tree View"
+			restorable="true">
+	  </view>
+   </extension>
+   
+
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi">
+         <view
+               id="org.eclipse.ui.views.ResourceNavigator"
+               relationship="stack"
+               relative="left"/>
+         <view
+               id="org.eclipse.ui.views.TaskList"
+               relationship="stack"
+               relative="top"/>
+         <view
+               id="org.eclipse.ui.views.BookmarkView"
+               relationship="stack"
+               relative="bottom"/>
+         <view
+               id="org.eclipse.ui.views.ProblemView"
+               relationship="stack"
+               relative="bottom"/>               
+         <view
+               id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.views.TimeZoneTreeView"
+               relationship="stack"
+               relative="right"/>
+               
+      </perspectiveExtension>
+   </extension>
     
     <!--extension
        point="org.eclipse.ltk.core.refactoring.renameParticipants">
