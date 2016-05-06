@@ -80,17 +80,6 @@ public class APIImportWizard extends WizardPage {
 		}
 		apiList = new ArrayList<>();
 	}
-	
-	public APIImportWizard(IProject project1) {
-		super("import");
-		setTitle("Import APIs from API Manager store");
-		setDescription("Import APIs from API Manager store");
-		//IProject project = getProject(selection);
-		if (project1 != null) {
-			setSelectedProject(project1);
-		}
-		apiList = new ArrayList<>();
-	}
 
 	@Override
 	public void createControl(Composite parent) {
@@ -305,25 +294,18 @@ public class APIImportWizard extends WizardPage {
 	 * List available connectors
 	 */
 	private void listAPIs() {
-		//project becomes null in the flow where API import happens in project creation flow
-	
-		if(selectedProject == null){
-			CompositeApiProjectCreationWizard creationWizard = new CompositeApiProjectCreationWizard();
-			creationWizard.performFinish();
-			this.setSelectedProject(creationWizard.getCompositeAPIProject());
-		}
 		
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		try {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {					
 					//try {
-						String iconCacheDirPath = getSelectedProject().getWorkspace().getRoot().getLocation().toOSString()
+						/*String iconCacheDirPath = getSelectedProject().getWorkspace().getRoot().getLocation().toOSString()
 								+ File.separator + DIR_DOT_METADATA + File.separator + DIR_CACHE;
 						File iconCacheDir = new File(iconCacheDirPath);
 						if (!iconCacheDir.exists()) {
 							iconCacheDir.mkdir();
-						}
+						}*/
 						int page = 1;
                         monitor.beginTask("Fetching list of APIs", 1000);
                         monitor.subTask("Searching APIs in store : page " + page);

@@ -19,9 +19,9 @@ public class TreeMemberLabelProvider extends LabelProvider {
 	 * @see ILabelProvider#getImage(Object)
 	 */
 	public Image getImage(Object element) {
-		/*ImageDescriptor descriptor = null;
+		ImageDescriptor descriptor = null;
 		Image icon = null;
-		try{
+		/*try{
 		if (element instanceof TreeMember) {
 			icon = new Image(null, new FileInputStream("icons/movingBox.gif"));
 		} else if (element instanceof Resource) {

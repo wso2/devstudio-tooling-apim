@@ -34,6 +34,7 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IGotoMarker;
@@ -91,7 +92,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	@PostConstruct
 	public Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new FormLayout());
+		composite.setLayout(new GridLayout(4, false));
 		
 		
 		
@@ -101,11 +102,11 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		treeViewer.setInput(getInitalInput());
 		treeViewer.expandAll();
 		Tree tree = treeViewer.getTree();
-		FormData fd_tree = new FormData();
-		fd_tree.bottom = new FormAttachment(100, -43);
-		fd_tree.left = new FormAttachment(0, 27);
-		fd_tree.right = new FormAttachment(0, 172);
-		tree.setLayoutData(fd_tree);
+		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 8));
+		
+		Button button = new Button(composite, SWT.NONE);
+		button.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 8));
+		button.setText(">>");
 		
 		treeViewer_1 = new TreeViewer(composite, SWT.BORDER);
 		treeViewer_1.setContentProvider(new TreeMemberContentProvider());
@@ -113,24 +114,18 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		treeViewer_1.setInput(getInitalInput1());
 		treeViewer_1.expandAll();
 		Tree tree_1 = treeViewer_1.getTree();
-		fd_tree.top = new FormAttachment(tree_1, 0, SWT.TOP);
-		FormData fd_tree_1 = new FormData();
-		fd_tree_1.bottom = new FormAttachment(100, -43);
-		fd_tree_1.top = new FormAttachment(0, 14);
-		tree_1.setLayoutData(fd_tree_1);
+		tree_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 8));
 		
-		Button button = new Button(composite, SWT.NONE);
-		fd_tree_1.left = new FormAttachment(button, 51);
-		FormData fd_button = new FormData();
-		fd_button.top = new FormAttachment(0, 147);
-		fd_button.right = new FormAttachment(100, -365);
-		button.setLayoutData(fd_button);
-		button.setText(">>");
+		Button btnAddResource = new Button(composite, SWT.NONE);
+		btnAddResource.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				new CompositeApiResourceEditor().run();
+			}
+		});
+		btnAddResource.setText("Add Resource");
 		
 		Button btnNewButton = new Button(composite, SWT.NONE);
-		fd_tree_1.right = new FormAttachment(100, -172);
-		FormData fd_btnNewButton = new FormData();
-		btnNewButton.setLayoutData(fd_btnNewButton);
 		btnNewButton.setText("Move up");
 		btnNewButton.addListener(SWT.Selection, new Listener() { 
 			   @Override 
@@ -140,12 +135,6 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 			  }); 
 		
 		Button btnNewButton_1 = new Button(composite, SWT.NONE);
-		fd_btnNewButton.bottom = new FormAttachment(btnNewButton_1, -20);
-		fd_btnNewButton.left = new FormAttachment(btnNewButton_1, 0, SWT.LEFT);
-		FormData fd_btnNewButton_1 = new FormData();
-		fd_btnNewButton_1.left = new FormAttachment(0, 503);
-		fd_btnNewButton_1.top = new FormAttachment(0, 180);
-		btnNewButton_1.setLayoutData(fd_btnNewButton_1);
 		btnNewButton_1.setText("Move down");
 		btnNewButton_1.addListener(SWT.Selection, new Listener() { 
 			   @Override 
@@ -164,33 +153,16 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 				IStructuredSelection selection = (IStructuredSelection) treeViewer_1.getSelection();
 				/* Tell the tree to not redraw until we finish
 				 * removing all the selected children. */
-				treeViewer_1.getTree().setRedraw(false);
+			
 				for (Iterator iterator = selection.iterator(); iterator.hasNext();) {
 					Model model = (Model) iterator.next();
 					TreeMember parent = model.getParent();
 					parent.remove(model);
 				}
-				treeViewer_1.getTree().setRedraw(true);
+				refresh(treeViewer_1);
 			}
 		});
-		FormData fd_btnNewButton_2 = new FormData();
-		fd_btnNewButton_2.top = new FormAttachment(btnNewButton_1, 28);
-		fd_btnNewButton_2.left = new FormAttachment(btnNewButton, 0, SWT.LEFT);
-		btnNewButton_2.setLayoutData(fd_btnNewButton_2);
 		btnNewButton_2.setText("Remove");
-		
-		Button btnAddResource = new Button(composite, SWT.NONE);
-		btnAddResource.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				new CompositeApiResourceEditor().run();
-			}
-		});
-		btnAddResource.setText("Add Resource");
-		FormData fd_btnAddResource = new FormData();
-		fd_btnAddResource.bottom = new FormAttachment(btnNewButton, -31);
-		fd_btnAddResource.right = new FormAttachment(100, -26);
-		btnAddResource.setLayoutData(fd_btnAddResource);
 		
 		connectListeners();
 		
@@ -213,8 +185,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		        	       }
 		        	   }
 		        	   receivingItem.add(selectedM1);
-		        	   treeViewer_1.refresh();
-		        	   treeViewer_1.expandAll();
+		        	   refresh(treeViewer_1);
 		        	  
 		        	 // treeViewer_1.add(selectedM2, selectedM1);
 		        	  //treeViewer_1.refresh();
@@ -353,7 +324,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		  List<Model> selectedItemParentsChildren = selectedItemParent.getResources();
 		  int currentItemPosition = selectedItemParentsChildren.indexOf(selectedObject);
 		  Collections.swap(selectedItemParentsChildren, currentItemPosition, currentItemPosition - 1);
-		  treeViewer_1.refresh();
+		  refresh(treeViewer_1);
 	  } 
 	  
 	//move down action
@@ -366,7 +337,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		  List<Model> selectedItemParentsChildren = selectedItemParent.getResources();
 		  int currentItemPosition = selectedItemParentsChildren.indexOf(selectedObject);
 		  Collections.swap(selectedItemParentsChildren, currentItemPosition, currentItemPosition + 1);
-		  treeViewer_1.refresh();
+		  refresh(treeViewer_1);
 	  } 
 	   
 	  /* 
@@ -476,7 +447,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
   	       }
   	   }
   	   receivingItem.add(temp1);
-  	   treeViewer_1.expandAll(); 
+  	 refresh(treeViewer_1); 
 		 
 	 }
 
@@ -504,12 +475,22 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	         	       }
 	         	   }
 	         	   receivingItem.add(temp1);
-	         	   treeViewer_1.expandAll();  
+	         	  refresh(treeViewer_1);  
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
 		
+	}
+	
+	private void refresh(TreeViewer treeViewer) {
+		treeViewer.getTree().setRedraw(false);
+		try {
+			treeViewer.refresh();
+			treeViewer.expandAll();
+		} finally {
+			treeViewer.getTree().setRedraw(true);
+		}
 	}
 	  
 }

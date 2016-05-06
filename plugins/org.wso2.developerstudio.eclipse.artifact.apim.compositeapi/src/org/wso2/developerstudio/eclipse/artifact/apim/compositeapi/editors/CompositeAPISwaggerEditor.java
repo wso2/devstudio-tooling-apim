@@ -81,7 +81,7 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 	 * which allows you to change the font used in page 2.
 	 */
 	void createPage1() {
-
+		//should open the yaml file in yedit
 		Composite composite = new Composite(getContainer(), SWT.NONE);
 		GridLayout layout = new GridLayout();
 		composite.setLayout(layout);
@@ -100,29 +100,15 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 		});
 
 		int index = addPage(composite);
-		setPageText(index, "Properties");
+		setPageText(index, "Source");
 	}
-	/**
-	 * Creates page 2 of the multi-page editor,
-	 * which shows the sorted text.
-	 */
-	void createPage2() {
-		Composite composite = new Composite(getContainer(), SWT.NONE);
-		FillLayout layout = new FillLayout();
-		composite.setLayout(layout);
-		text = new StyledText(composite, SWT.H_SCROLL | SWT.V_SCROLL);
-		text.setEditable(false);
-
-		int index = addPage(composite);
-		setPageText(index, "Preview");
-	}
+	
 	/**
 	 * Creates the pages of the multi-page editor.
 	 */
 	protected void createPages() {
 		createPage0();
 		createPage1();
-		createPage2();
 	}
 	/**
 	 * The <code>MultiPageEditorPart</code> implementation of this 
@@ -166,6 +152,8 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 		if (!(editorInput instanceof IFileEditorInput))
 			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
 		super.init(site, editorInput);
+		String name = editorInput.getName();
+	    setTitle(name);
 	}
 	/* (non-Javadoc)
 	 * Method declared on IEditorPart.
