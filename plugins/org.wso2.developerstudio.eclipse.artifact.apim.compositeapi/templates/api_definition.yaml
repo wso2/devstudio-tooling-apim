@@ -1,0 +1,83 @@
+basePath: /calc/1.0
+host: "https://localhost:9443"
+paths:
+  /divide:
+    get:
+      x-auth-type: "Application & Application User"
+      summary: divide x by y
+      x-throttling-tier: Unlimited
+      produces: application/json
+      parameters:
+        - name: x
+          type: string
+          required: true
+          in: query
+        - name: "y"
+          type: string
+          required: true
+          in: query
+      responses:
+        "200": {}
+  /subtract:
+    get:
+      x-auth-type: "Application & Application User"
+      summary: subtract y from x
+      x-throttling-tier: Unlimited
+      produces: application/json
+      parameters:
+        - name: x
+          type: string
+          required: true
+          in: query
+        - name: "y"
+          type: string
+          required: true
+          in: query
+      responses:
+        "200": {}
+  /add:
+    get:
+      x-auth-type: "Application & Application User"
+      summary: add x and y
+      x-throttling-tier: Unlimited
+      produces: application/json
+      parameters:
+        - name: x
+          type: string
+          required: true
+          in: query
+        - name: "y"
+          type: string
+          required: true
+          in: query
+      responses:
+        "200": {}
+  /multiply:
+    get:
+      x-auth-type: "Application & Application User"
+      summary: multiply x by y
+      x-throttling-tier: Unlimited
+      produces: application/json
+      parameters:
+        - name: x
+          type: string
+          required: true
+          in: query
+        - name: "y"
+          type: string
+          required: true
+          in: query
+      responses:
+        "200": {}
+x-wso2-security:
+  apim:
+    x-wso2-scopes:
+      - description: ""
+        name: scope1
+        roles: admin
+        key: scope1
+swagger: "2.0"
+info:
+  title: Calculator
+  description: "Simple calculator API to perform addition, subtraction, multiplication and division."
+  version: "1.0"

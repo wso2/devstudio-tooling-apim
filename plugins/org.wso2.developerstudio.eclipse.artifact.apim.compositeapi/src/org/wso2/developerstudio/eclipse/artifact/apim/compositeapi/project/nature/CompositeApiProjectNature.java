@@ -11,13 +11,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiMavenConstants;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiTemplateUtils;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
 import org.wso2.developerstudio.eclipse.maven.util.MavenUtils;
 import org.wso2.developerstudio.eclipse.platform.core.nature.AbstractWSO2ProjectNature;
+import org.wso2.developerstudio.eclipse.utils.file.FileUtils;
 import org.wso2.developerstudio.eclipse.utils.project.ProjectUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CompositeApiProjectNature extends AbstractWSO2ProjectNature {
 
@@ -25,7 +28,7 @@ public class CompositeApiProjectNature extends AbstractWSO2ProjectNature {
     private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
     public void configure() throws CoreException {
-        String[] childrenList = {CompositeApiConstants.COMP_API_DIR};
+    	String[] childrenList = {"Primary APIs", "Meta-data"};
         IFolder parentFolder =
                 ProjectUtils.getWorkspaceFolder(getProject(), "src", "main");
         ProjectUtils.createFolder(parentFolder);
@@ -33,6 +36,9 @@ public class CompositeApiProjectNature extends AbstractWSO2ProjectNature {
         for (String child : childrenList) {
             createChildren(parentFolder, child);
         }
+        //Create Files
+        //createChildFiles(parentFolder, "api_definition.yaml", "api_definition.yaml");
+        //createChildFiles(parentFolder, "composite_api.iflow", "composite_api.iflow");
         updatePom();
     }
 
@@ -140,6 +146,21 @@ public class CompositeApiProjectNature extends AbstractWSO2ProjectNature {
 
     }
 
+    private void createChildFiles(IFolder parent, String templateName, String fileName){
+        File compositeApiTemplateFile;
+        try {
+        	compositeApiTemplateFile = new CompositeApiTemplateUtils().getResourceFile("templates" + File.separator
+                    + templateName);
+        
+        String templateContent = FileUtils.getContentAsString(compositeApiTemplateFile);
+        File destFile = new File(parent.getLocation().toFile(),
+                fileName);
+        FileUtils.createFile(destFile, templateContent);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     public void deconfigure() throws CoreException {
 

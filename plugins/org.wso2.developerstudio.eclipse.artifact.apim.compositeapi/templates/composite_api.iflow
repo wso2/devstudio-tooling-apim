@@ -1,0 +1,35 @@
+@startuml
+
+#Defining my integration flow
+myIntegrationFlow as IntegrationFlow
+
+//This is a sample inbound endpoint
+sampleHTTPinbound as InboundEndpoint(protocol("http"),port(8290),context("/sample/request"))
+
+samplePipeline as Pipeline("message_flow_1")
+
+sampleOutbound1 as OutboundEndpoint(protocol("http"),host("http://localhost:9000/services/SimpleStockQuoteService"))
+
+sampleOutbound2 as OutboundEndpoint(protocol("http"),host("http://localhost:9001/services/SimpleStockQuoteService"))
+
+sampleHTTPinbound =>+ samplePipeline comment "client request"
+
+log("before filter statement") as Mediator
+
+alt with condition(source("$header.routeId"),pattern("r1"))
+    log("filter condition is true") as Mediator
+    samplePipeline =>>+ sampleOutbound1 comment "Validate policy with service 1"
+    sampleOutbound1 =>>- samplePipeline comment "Validate response from service 1"
+
+else
+    log("filter condition is false") as Mediator
+    samplePipeline =>>+ sampleOutbound2 comment "Validate policy with service 2"
+    sampleOutbound2 =>>- samplePipeline comment "Validate response from service 2"
+end
+
+log("after filter statement") as Mediator
+
+samplePipeline =>- sampleHTTPinbound comment "Final Response"
+
+
+@enduml

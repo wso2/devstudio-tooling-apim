@@ -18,7 +18,7 @@ public class CompositeApiConstants extends NLS {
 	//public static String WIZARD_OPTION_ANALYTICS_NAME;
 	//public static String WIZARD_OPTION_ANALYTICS_LOCATION;
 	
-	public static String ANALYTICS_STREAM_DIR;
+	/*public static String ANALYTICS_STREAM_DIR;
 	public static String ANALYTICS_EXECUTION_PLAN_DIR;
 	public static String ANALYTICS_RECEIVER_DIR;
 	public static String ANALYTICS_PUBLISHER_DIR;
@@ -45,7 +45,7 @@ public class CompositeApiConstants extends NLS {
 	public static String NAMETAG_EXECUTIONPLAN_TEMPLATE;
 	public static String NAMETAG_PUBLISHER_TEMPLATE;
 	public static String NAMETAG_RECEIVER_TEMPLATE;
-	public static String NAMETAG_STREAM_TEMPLATE;
+	public static String NAMETAG_STREAM_TEMPLATE;*/
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, CompositeApiConstants.class);

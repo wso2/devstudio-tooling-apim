@@ -5,7 +5,16 @@ Bundle-SymbolicName: org.wso2.developerstudio.eclipse.artifact.apim.compositeapi
 Bundle-Version: 4.0.0
 Bundle-Activator: org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.eclipse.osgi.services;bundle-version="3.4.0",
+ org.eclipse.e4.ui.workbench;bundle-version="1.2.2",
+ org.eclipse.e4.ui.model.workbench;bundle-version="1.1.0",
+ org.eclipse.e4.core.di;bundle-version="1.4.0",
+ org.eclipse.jface.text,
+ org.eclipse.core.resources,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.codec.binary;version="1.6.0",
@@ -15,10 +24,15 @@ Import-Package: org.apache.commons.codec.binary;version="1.6.0",
  org.apache.maven.project,
  org.codehaus.plexus.util.xml,
  org.eclipse.core.resources,
+ org.eclipse.e4.core.services.events,
+ org.eclipse.e4.ui.di,
+ org.eclipse.gmf.runtime.common.ui.services.marker,
  org.eclipse.jdt.core,
  org.eclipse.jdt.ui,
+ org.eclipse.ui.ide,
  org.wso2.carbon.utils;version="4.2.0",
  org.wso2.developerstudio.eclipse.distribution.project.export;version="[4.0.0,4.1.0)",
+ org.wso2.developerstudio.eclipse.gmf.esb,
  org.wso2.developerstudio.eclipse.libraries.utils;version="4.0.0",
  org.wso2.developerstudio.eclipse.logging.core;version="4.0.0",
  org.wso2.developerstudio.eclipse.maven.util;version="4.0.0",
@@ -28,6 +42,8 @@ Import-Package: org.apache.commons.codec.binary;version="1.6.0",
  org.wso2.developerstudio.eclipse.platform.core.nature;version="4.0.0",
  org.wso2.developerstudio.eclipse.platform.core.project.export;version="4.0.0",
  org.wso2.developerstudio.eclipse.platform.core.project.model;version="4.0.0",
+ org.wso2.developerstudio.eclipse.platform.ui.editor;version="4.0.0",
+ org.wso2.developerstudio.eclipse.platform.ui.startup;version="4.0.0",
  org.wso2.developerstudio.eclipse.platform.ui.validator;version="4.0.0",
  org.wso2.developerstudio.eclipse.platform.ui.wizard;version="4.0.0",
  org.wso2.developerstudio.eclipse.platform.ui.wizard.pages;version="4.0.0",
@@ -36,6 +52,8 @@ Import-Package: org.apache.commons.codec.binary;version="1.6.0",
  org.wso2.developerstudio.eclipse.utils.file;version="4.0.0",
  org.wso2.developerstudio.eclipse.utils.jdt;version="4.0.0",
  org.wso2.developerstudio.eclipse.utils.project;version="4.0.0",
+ org.wso2.developerstudio.eclipse.utils.template;version="4.0.0",
  org.wso2.developerstudio.eclipse.utils.ui;version="4.0.0"
 Bundle-ClassPath: lib/json_2.0.0.wso2v1.jar,
- .
+ .,
+ lib/snakeyaml-1.13.jar

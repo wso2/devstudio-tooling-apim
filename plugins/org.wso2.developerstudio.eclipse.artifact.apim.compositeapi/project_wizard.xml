@@ -4,7 +4,7 @@
 					description="Select how you would like to create your new composite API" 
 					error="Please select a method to create composite API">
 		<option id="new.compositeApiProject" default="true">Create New Composite API</option>
-		<option id="import.compositeApiProject">Import composite API</option>
+		<!--option id="import.compositeApiProject">Import composite API</option-->
 	</projectOptions>
 	
 	<projectOptionSettings>
