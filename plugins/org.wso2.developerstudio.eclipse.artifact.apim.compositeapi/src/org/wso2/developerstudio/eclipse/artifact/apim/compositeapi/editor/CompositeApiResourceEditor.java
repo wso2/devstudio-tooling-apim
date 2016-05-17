@@ -78,42 +78,42 @@ public class CompositeApiResourceEditor extends ApplicationWindow{
 		fd_text.left = new FormAttachment(lblUriTemplate, 32);
 		text.setLayoutData(fd_text);
 		
-		Button btnGet = new Button(composite, SWT.CHECK);
+		final Button btnGet = new Button(composite, SWT.CHECK);
 		FormData fd_btnGet = new FormData();
 		fd_btnGet.top = new FormAttachment(lblUriTemplate, 18);
 		fd_btnGet.left = new FormAttachment(0, 22);
 		btnGet.setLayoutData(fd_btnGet);
 		btnGet.setText("GET");
 		
-		Button btnPost = new Button(composite, SWT.CHECK);
+		final Button btnPost = new Button(composite, SWT.CHECK);
 		btnPost.setText("POST");
 		FormData fd_btnPost = new FormData();
 		fd_btnPost.top = new FormAttachment(btnGet, 0, SWT.TOP);
 		fd_btnPost.left = new FormAttachment(btnGet, 11);
 		btnPost.setLayoutData(fd_btnPost);
 		
-		Button btnPut = new Button(composite, SWT.CHECK);
+		final Button btnPut = new Button(composite, SWT.CHECK);
 		btnPut.setText("PUT");
 		FormData fd_btnPut = new FormData();
 		fd_btnPut.top = new FormAttachment(btnGet, 0, SWT.TOP);
 		fd_btnPut.left = new FormAttachment(text, 0, SWT.LEFT);
 		btnPut.setLayoutData(fd_btnPut);
 		
-		Button btnDelete = new Button(composite, SWT.CHECK);
+		final Button btnDelete = new Button(composite, SWT.CHECK);
 		btnDelete.setText("DELETE");
 		FormData fd_btnDelete = new FormData();
 		fd_btnDelete.top = new FormAttachment(btnGet, 0, SWT.TOP);
 		fd_btnDelete.left = new FormAttachment(btnPut, 6);
 		btnDelete.setLayoutData(fd_btnDelete);
 		
-		Button btnHead = new Button(composite, SWT.CHECK);
+		final Button btnHead = new Button(composite, SWT.CHECK);
 		btnHead.setText("HEAD");
 		FormData fd_btnHead = new FormData();
 		fd_btnHead.top = new FormAttachment(btnGet, 0, SWT.TOP);
 		fd_btnHead.left = new FormAttachment(btnDelete, 6);
 		btnHead.setLayoutData(fd_btnHead);
 		
-		Button btnOptions = new Button(composite, SWT.CHECK);
+		final Button btnOptions = new Button(composite, SWT.CHECK);
 		btnOptions.setText("OPTIONS");
 		FormData fd_btnOptions = new FormData();
 		fd_btnOptions.top = new FormAttachment(btnGet, 0, SWT.TOP);

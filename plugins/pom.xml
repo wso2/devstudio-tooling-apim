@@ -4,7 +4,7 @@
     <parent>
         <artifactId>wso2-developerstudio-apim-toolkit</artifactId>
         <groupId>org.wso2.developerstudio</groupId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>wso2-developerstudio-apim-plugins</artifactId>
@@ -12,6 +12,7 @@
     <name>WSO2 API Manager Tooling Plugins</name>
     <modules>
         <module>org.wso2.developerstudio.eclipse.registry.apim.perspective</module>
+        <module>org.wso2.developerstudio.eclipse.artifact.apim.compositeapi</module>
     </modules>
     <build>
         <plugins>

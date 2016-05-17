@@ -27,7 +27,7 @@
 		</wizard>
    </extension> 
    <extension
-		point="org.wso2.developerstudio.eclipse.platform.core.intro.ui.dashboard">
+		point="org.wso2.developerstudio.eclipse.dashboad.link">
 		<wizardCategory category="org.wso2.developerstudio.eclipse.artifact.apim.category"/>
     	<category id="dashboard.category.apim" showTitle="true"
                   title="API Manager"
