@@ -12,8 +12,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.wso2.developerstudio.eclipse.gmf.esb.ArtifactType;
 import org.wso2.developerstudio.eclipse.maven.util.MavenUtils;
@@ -129,9 +133,9 @@ public class CompositeApiProjectCreationWizard extends
 			
 
 			//Open swagger file in the editor
-			/*if (fileList.size() > 0) {
+			if (fileList.size() > 0) {
 				openEditor(fileList.get(0));
-			}*/
+			}
 		} catch (Exception e) {
 			MessageDialog.openError(getShell(),
 					"Error while creating the project", e.getMessage());
@@ -191,9 +195,14 @@ public class CompositeApiProjectCreationWizard extends
 			
 			String path = swaggerFile.getParent().getFullPath() + "/";
 			String source = FileUtils.getContentAsString(file);
-			Openable openable = ESBGraphicalEditor.getOpenable();
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		    IWorkbenchPage page = window.getActivePage();
+			IEditorDescriptor desc = PlatformUI.getWorkbench().
+			        getEditorRegistry().getDefaultEditor(file.getName());
+			page.openEditor(new FileEditorInput(swaggerFile), desc.getId());
+			/*Openable openable = ESBGraphicalEditor.getOpenable();
 			String type = ArtifactType.API.getLiteral();
-			openable.editorOpen(file.getName(), type, path, source);
+			openable.editorOpen(file.getName(), type, path, source);*/
 		} catch (Exception e) {
 			//log.error("Cannot open the editor", e);
 		}
