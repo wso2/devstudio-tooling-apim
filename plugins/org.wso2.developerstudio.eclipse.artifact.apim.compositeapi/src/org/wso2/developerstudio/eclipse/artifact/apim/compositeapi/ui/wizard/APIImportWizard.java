@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,8 +46,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.API;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeAPIUtils;
 import org.wso2.developerstudio.eclipse.logging.core.IDeveloperStudioLog;
 import org.wso2.developerstudio.eclipse.logging.core.Logger;
@@ -59,10 +63,10 @@ public class APIImportWizard extends WizardPage {
 	private Text password;
 	private String apiStorePath;
 	private IProject selectedProject;
-	private List<String> apiList;
+	private List<API> apiList;
 	private Table table;
-	private Button apiStore;
-	private Button fileSystem;	
+	private Label apiStore;
+	//private Button fileSystem;	
 	private static final String DIR_DOT_METADATA = ".metadata";
 	private static final String DIR_CACHE = ".cache";
 	private static final String CONNECTOR_STORE_URL = "https://localhost:9443";
@@ -85,8 +89,8 @@ public class APIImportWizard extends WizardPage {
 		final Composite container = new Composite(parent, SWT.NULL);
 		final Shell shell= new Shell(SWT.NULL);
 		setControl(container);
-		container.setLayout(new GridLayout(3, false));
-		fileSystem = new Button(container, SWT.RADIO);
+		container.setLayout(new GridLayout(2, false));
+		/*fileSystem = new Button(container, SWT.RADIO);
 		fileSystem.setText("API location");
 		fileSystem.setSelection(true);
 
@@ -122,9 +126,9 @@ public class APIImportWizard extends WizardPage {
 				validate();
 			}
 		});
-		btnBrowse1.setText("Browse..");
+		btnBrowse1.setText("Browse..");*/
 
-		apiStore = new Button(container, SWT.RADIO);
+		apiStore = new Label(container, SWT.NONE);
 		apiStore.setText("API Store location");
 		txtAPIStoreURL = new Text(container, SWT.BORDER);
 		GridData gd_txtPath = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -195,8 +199,15 @@ public class APIImportWizard extends WizardPage {
 		} else {
 			// setPageComplete(false);
 		}
-		txtAPIStoreURL.setEnabled(false);
+		//txtAPIStoreURL.setEnabled(false);
+		
+		txtAPIStoreURL.setText(CONNECTOR_STORE_URL);
+		txtAPIStoreURL.setEnabled(true);
+		
+		
 
+		//txtAPIStorePath.setEnabled(false);
+		
 		final Button btnBrowse = new Button(container, SWT.NONE);
 		btnBrowse.setEnabled(false);
 		GridData gridData = new GridData();
@@ -227,13 +238,14 @@ public class APIImportWizard extends WizardPage {
 		table.setLayoutData(gridData);
 		btnBrowse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				listConnectors();
+				listAPIs();
 				container.forceFocus();
 			}
 		});
 		btnBrowse.setText("Connect");
-
-		fileSystem.addSelectionListener(new SelectionAdapter() {
+		btnBrowse.setEnabled(true);
+		table.setEnabled(true);
+		/*fileSystem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				txtAPIStorePath.setEnabled(true);
 				btnBrowse1.setEnabled(true);
@@ -253,9 +265,9 @@ public class APIImportWizard extends WizardPage {
 				table.setEnabled(true);
 
 				txtAPIStorePath.setEnabled(false);
-				btnBrowse1.setEnabled(false);
+				//btnBrowse1.setEnabled(false);
 			}
-		});
+		});*/
 	}
 
 	public static IProject getProject(Object obj){
@@ -284,24 +296,35 @@ public class APIImportWizard extends WizardPage {
 	/*
 	 * List available connectors
 	 */
-	private void listConnectors() {
+	private void listAPIs() {
+		
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+		IProject selectedProject = null;
+		if (getSelectedProject() == null) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			IWorkbenchPage page = window.getActivePage();
+			selectedProject = page.getActiveEditor().getEditorInput().getAdapter(IFile.class).getProject();
+			
+		} else {
+			selectedProject = getSelectedProject();
+		}
+		
 		try {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {					
 					//try {
-						String iconCacheDirPath = getSelectedProject().getWorkspace().getRoot().getLocation().toOSString()
+						/*String iconCacheDirPath = getSelectedProject().getWorkspace().getRoot().getLocation().toOSString()
 								+ File.separator + DIR_DOT_METADATA + File.separator + DIR_CACHE;
 						File iconCacheDir = new File(iconCacheDirPath);
 						if (!iconCacheDir.exists()) {
 							iconCacheDir.mkdir();
-						}
+						}*/
 						int page = 1;
-                        monitor.beginTask("Fetching list of connectors", 1000);
-                        monitor.subTask("Searching connectors in store : page " + page);
+                        monitor.beginTask("Fetching list of APIs", 1000);
+                        monitor.subTask("Searching APIs in store : page " + page);
                         
                         //Retrieving APIs from store
-                        List<String> tmpList = CompositeAPIUtils.getAPIsFromStore(txtAPIStoreURL.getText(), username.getText(), password.getText());
+                        List<API> tmpList = CompositeAPIUtils.getAPIsFromStore(txtAPIStoreURL.getText(), username.getText(), password.getText());
                         
                         //List<Connector> tmpList = ConnectorStore.getConnectorInfo(txtAPIStoreURL.getText(), page);
 						if (tmpList != null && !tmpList.isEmpty()) {
@@ -312,7 +335,7 @@ public class APIImportWizard extends WizardPage {
                             tmpList = ConnectorStore.getConnectorInfo(txtAPIStoreURL.getText(), page);*/
 						}
 						//int workUnit = (1000 - (25*page))/connectorList.size();
-						for (String api : apiList) {
+						for (API api : apiList) {
                             monitor.subTask("Fetching details of " + api);
                             //String imageLocation = null;
                             TableItem item = new TableItem(table, SWT.NONE);
@@ -340,8 +363,8 @@ public class APIImportWizard extends WizardPage {
                             } catch (IOException e) {
                                 //log.error("Error while downloading " + imageFileName, e);
                             }*/
-                            item.setText(new String[] { api,
-                                    "1.0.0" });
+                            item.setText(new String[] { api.getName(),
+                                    api.getVersion() });
                             item.setData(api);
                             monitor.worked(10);
                         }
@@ -353,7 +376,7 @@ public class APIImportWizard extends WizardPage {
                         //monitor.done();
 					//}
 				}
-			}, getSelectedProject().getWorkspace().getRoot());
+			}, selectedProject.getWorkspace().getRoot());
 		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			//log.error("Error while listing connectors", e);
@@ -404,7 +427,7 @@ public class APIImportWizard extends WizardPage {
 		this.table = table;
 	}
 
-	public Button getConnectorStore() {
+	/*public Button getConnectorStore() {
 		return apiStore;
 	}
 
@@ -418,13 +441,13 @@ public class APIImportWizard extends WizardPage {
 
 	public void setFileSystem(Button fileSystem) {
 		this.fileSystem = fileSystem;
-	}
+	}*/
 	
-	public List<String> getAPIList() {
+	public List<API> getAPIList() {
 		return apiList;
 	}
 
-	public void setConnectorList(List<String> connectorList) {
-		this.apiList = connectorList;
+	public void setConnectorList(List<API> apiList) {
+		this.apiList = apiList;
 	}
 }

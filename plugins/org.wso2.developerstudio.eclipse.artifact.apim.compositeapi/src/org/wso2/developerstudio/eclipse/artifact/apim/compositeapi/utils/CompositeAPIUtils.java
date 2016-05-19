@@ -17,30 +17,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.security.cert.X509Certificate;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
 import org.eclipse.swt.widgets.Text;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.API;
+import org.yaml.snakeyaml.Yaml;
 
 public class CompositeAPIUtils {
 	//Implemented for km url == gw url
-	public static List<String> getAPIsFromStore(String url, String username,
-			String password) {
-		
+	private static String consumeKey;
+	private static String consumerSecret;
+	private static String storeUrl;
+	private static String username;
+	private static String password;
+	
+	public static List<API> getAPIsFromStore(String url, String username1,
+			String password1) {
+		storeUrl = url;
+		username = username1;
+		password = password1;
+		setTrustore();
 		Map<String, String> dataMap = registerOAuthApplication(url, username, password);
 		String accessToken = generateOAuthAccessToken("apim:api_view", dataMap, url, username, password);
 		
-		List<String> APIs = getAPIs(url, accessToken);
+		List<API> APIs = getAPIs(url, accessToken);
 		
 		return APIs;
 		
 	}
 	
-	private static List<String> getAPIs(String url, String accessToken) {
-		List<String> apis = new ArrayList<String>();
+	private static List<API> getAPIs(String url, String accessToken) {
+		List<API> apis = new ArrayList<API>();
 		try{
-		//apis = new ArrayList<String>();
 		URL tokenEndpointURL = new URL(url + "/api/am/store/v0.9/apis");
 		HashMap<String, String> accessKeyMap = new HashMap<String, String>();
 		accessKeyMap.put("Authorization", "Bearer " + accessToken);
@@ -49,13 +71,19 @@ public class CompositeAPIUtils {
 		JSONObject apiJsonObject = new JSONObject(response);
 		JSONObject responseContent = new JSONObject(apiJsonObject.get("data").toString());
 		JSONArray apiArray = responseContent.getJSONArray("list");
+		API importedApi;
 		
 		if(apiArray != null){
 			for (int i = 0, size = apiArray.length(); i < size; i++)
 		    {
 		      JSONObject objectInArray = apiArray.getJSONObject(i);
-
-		      apis.add(objectInArray.getString("name"));
+		      importedApi = new API();
+		      importedApi.setId(objectInArray.getString("id"));
+		      importedApi.setName(objectInArray.getString("name"));
+		      importedApi.setProvider(objectInArray.getString("provider"));
+		      importedApi.setVersion(objectInArray.getString("version"));
+		      importedApi.setContext(objectInArray.getString("context"));
+		      apis.add(importedApi);
 		      
 		    }
 		}
@@ -69,8 +97,8 @@ public class CompositeAPIUtils {
 	private static String generateOAuthAccessToken(String scope,
 			Map<String, String> dataMap, String url, String username, String password) {
 		try {
-            String consumeKey = dataMap.get("consumerKey");
-            String consumerSecret = dataMap.get("consumerSecret");
+            consumeKey = dataMap.get("consumerKey");
+            consumerSecret = dataMap.get("consumerSecret");
             String messageBody = "grant_type=password&username=" + username + "&password=" + password + "&scope=" + scope;
             URL tokenEndpointURL = new URL("https://localhost:8243/token");
             HashMap<String, String> accessKeyMap = new HashMap<String, String>();
@@ -139,6 +167,38 @@ public class CompositeAPIUtils {
         }
         return dataMap;
     }
+	
+	public static String getApiSwaggerDefinition(String apiId){
+		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("consumerKey", consumeKey);
+        dataMap.put("consumerSecret", consumerSecret);
+        
+        String accessToken = generateOAuthAccessToken("apim:api_view", dataMap, storeUrl, username, password);
+        
+        //List<API> apis = new ArrayList<API>();
+		try{
+		URL apiEndpointURL = new URL(storeUrl + "/api/am/store/v0.9/apis/" + apiId + "/swagger" );
+		HashMap<String, String> accessKeyMap = new HashMap<String, String>();
+		accessKeyMap.put("Authorization", "Bearer " + accessToken);
+		HTTPResponse response = doGet(apiEndpointURL, accessKeyMap);
+		
+		JSONObject apiJsonObject = new JSONObject(response);
+		JSONObject responseContent = new JSONObject(apiJsonObject.get("data").toString());
+		Yaml yaml = new Yaml();
+		  // get json string
+		  String prettyJSONString = responseContent.toString();
+		  // mapping
+		  Map<String,Object> map = (Map<String, Object>) yaml.load(prettyJSONString);
+		  // convert to yaml string (yaml formatted string)
+		  String output = yaml.dump(map);
+		  return output;
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+        
+	}
 	
 	public static HTTPResponse doPost(URL endpoint, String postBody, Map<String, String> headers) throws Exception {
         HttpURLConnection urlConnection = null;
@@ -280,4 +340,50 @@ public class CompositeAPIUtils {
 
         return ignored1;
     }
+	
+	private static void setTrustore(){
+		SSLContext sc = null;
+		try {
+			sc = SSLContext.getInstance("SSL");
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        // Create empty HostnameVerifier
+        HostnameVerifier hv = new HostnameVerifier() {
+            public boolean verify(String arg0, SSLSession arg1) {
+                return true;
+            }
+        };
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+			@Override
+			public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+        } };
+        try {
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	}
 }

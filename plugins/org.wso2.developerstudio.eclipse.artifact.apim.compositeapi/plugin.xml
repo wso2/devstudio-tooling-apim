@@ -27,7 +27,7 @@
 		</wizard>
    </extension> 
    <extension
-		point="org.wso2.developerstudio.eclipse.platform.core.intro.ui.dashboard">
+		point="org.wso2.developerstudio.eclipse.dashboad.link">
 		<wizardCategory category="org.wso2.developerstudio.eclipse.artifact.apim.category"/>
     	<category id="dashboard.category.apim" showTitle="true"
                   title="API Manager"
@@ -81,14 +81,22 @@
 
 	<extension point="org.eclipse.ui.ide.projectNatureImages">
 		<image id="org.wso2.developerstudio.eclipse.artifact.project.natureImage"
-			natureId="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.project.nature" icon="icons/new-mediator-12x12.png">
+			natureId="org.wso2.developerstudio.eclipse.artifact.project.nature" icon="icons/new-mediator-12x12.png">
 		</image>
 	</extension>
 	
-	<extension
+	<extension point="org.eclipse.ui.perspectives">
+		<perspective
+			class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.perspective.CompositeAPIPerspective"
+			icon="icons/api-default.png" id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi"
+			name="WSO2 Composite API">
+		</perspective>
+	</extension>
+	
+	<!--extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.perspective.PerspectiveFactory"
+            class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.perspective.CompositeAPIPerspective"
             id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi"
             name="CompositeAPI"/>
    </extension>
@@ -135,7 +143,7 @@
                relative="right"/>
                
       </perspectiveExtension>
-   </extension>
+   </extension-->
     
     <!--extension
        point="org.eclipse.ltk.core.refactoring.renameParticipants">
@@ -207,5 +215,14 @@
            nature="org.wso2.developerstudio.eclipse.artifact.analytics.project.nature">
      </provider>
   </extensi-->
- 	  
+  <extension point="org.eclipse.ui.editors" id="api-editor">
+      <editor
+            class="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editors.CompositeAPISwaggerEditor"
+            contributorClass="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editors.CompositeAPISwaggerEditorrContributor"
+            extensions="yaml"
+            icon="icons/sample.gif"
+            id="org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editors.CompositeAPISwaggerEditor"
+            name="Composite API Swagger Editor">
+      </editor>
+   </extension>
 </plugin>

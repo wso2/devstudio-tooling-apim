@@ -13,18 +13,34 @@ import java.util.regex.Pattern;
 //import net.lingala.zip4j.core.ZipFile;
 //import net.lingala.zip4j.exception.ZipException;
 
-import org.apache.commons.io.FileUtils;
+
+
+
+
+
+
+
+import org.wso2.developerstudio.eclipse.utils.file.FileUtils;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.ImportStoreApiRequest;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.API;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeAPIUtils;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
 //import org.wso2.developerstudio.eclipse.esb.project.Activator;
 //import org.wso2.developerstudio.eclipse.esb.project.connector.store.Connector;
 //import org.wso2.developerstudio.eclipse.esb.project.control.graphicalproject.GMFPluginDetails;
@@ -41,6 +57,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	//private ImportRemoveSelectionWizardPage selectionPage;
 	private static final String DIR_DOT_METADATA = ".metadata";
 	private static final String DIR_CONNECTORS = ".Connectors";
+	private IEventBroker importStoreApiEB;
 
 	//private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
@@ -63,7 +80,6 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	public void addPages() {
 		//addPage(selectionPage);
 		addPage(importWizardPage);
-		getPage("jkhjk");
 		//addPage(removeWizardPage);
 	}
 
@@ -72,11 +88,11 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	 */
 	public boolean performFinish() {
 		if (importWizardPage.equals(getContainer().getCurrentPage())) {
-			if (importWizardPage.getConnectorStore().getSelection()) {
+			//if (importWizardPage.getConnectorStore().getSelection()) {
 				return performFinishStore();
-			} else if (importWizardPage.getFileSystem().getSelection()) {
+			/*} else if (importWizardPage.getFileSystem().getSelection()) {
 				return performFinishFileSystem();
-			}
+			}*/
 		} 
 		/*else if (removeWizardPage.equals(getContainer().getCurrentPage())) {
 			return performFinishRemove();
@@ -89,31 +105,51 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	 * import from connector store option.
 	 */
     private boolean performFinishStore() {
-        final List<String> selectedConnectors = new ArrayList<>();
+    	
+    	IProject selectedProject = null;
+		if (importWizardPage.getSelectedProject() == null) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			IWorkbenchPage page = window.getActivePage();
+			selectedProject = page.getActiveEditor().getEditorInput().getAdapter(IFile.class).getProject();
+			
+		} else {
+			selectedProject = importWizardPage.getSelectedProject();
+		}
+    	
+        final List<API> selectedAPIs = new ArrayList<>();
         for (TableItem tableItem : importWizardPage.getTable().getItems()) {
             if (tableItem.getChecked()) {
-                selectedConnectors.add((String) tableItem.getData());
+            	selectedAPIs.add((API) tableItem.getData());
             }
         }
-        Job downloadJob = new Job("Downloading Connectors") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                int noOfConnectors = selectedConnectors.size();
-                int count = 1;
-                monitor.beginTask("Downloading connector", noOfConnectors);
-                for (String connector : selectedConnectors) {
-                    /*monitor.subTask(count + " of " + noOfConnectors + " : "
-                            + connector.getAttributes().getOverview_name() + " connector");
-                    String downloadLink = connector.getAttributes().getOverview_downloadlink();
-                    downloadConnectorAndUpdateProjects(downloadLink);
-                    monitor.worked(1);*/
-                    count++;
-                }
-                monitor.done();
-                return Status.OK_STATUS;
-            }
-        };
-        downloadJob.schedule();
+        
+        //Adding imported APIs to the project
+        for (API api : selectedAPIs){
+        	String content = CompositeAPIUtils.getApiSwaggerDefinition(api.getId());
+        	File destFile = new File(selectedProject.getFolder("src").getFolder("main").getFolder("Primary APIs").getLocation().toFile(),
+                    api.getName() + "-" + api.getVersion() + ".yaml");
+            try {
+				FileUtils.createFile(destFile, content);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        
+        //Refresh project is required to make added files visible
+        try {
+        	selectedProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        if (importStoreApiEB == null) {
+        	importStoreApiEB = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        }
+        importStoreApiEB.send("importStoreApi",
+                new ImportStoreApiRequest());
+        
         return true;
     }
 	
@@ -132,7 +168,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 				parentDirectory.mkdir();
 			}
 			File file = new File(source);
-			FileUtils.copyFileToDirectory(file, parentDirectory);
+			FileUtils.copyDirectory(file, parentDirectory);
 
 			//updateProjects(source);
 		//} //catch (ZipException e) {
@@ -199,6 +235,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	//}
 
 	private boolean downloadConnectorAndUpdateProjects(String downloadLink) {
+		
 		String zipDestination = null;
 		try {
 			URL url = new URL(downloadLink);
