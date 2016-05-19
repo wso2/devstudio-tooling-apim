@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,6 +46,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.API;
@@ -296,6 +299,16 @@ public class APIImportWizard extends WizardPage {
 	private void listAPIs() {
 		
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+		IProject selectedProject = null;
+		if (getSelectedProject() == null) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			IWorkbenchPage page = window.getActivePage();
+			selectedProject = page.getActiveEditor().getEditorInput().getAdapter(IFile.class).getProject();
+			
+		} else {
+			selectedProject = getSelectedProject();
+		}
+		
 		try {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {					
@@ -363,7 +376,7 @@ public class APIImportWizard extends WizardPage {
                         //monitor.done();
 					//}
 				}
-			}, getSelectedProject().getWorkspace().getRoot());
+			}, selectedProject.getWorkspace().getRoot());
 		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			//log.error("Error while listing connectors", e);

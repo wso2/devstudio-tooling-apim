@@ -17,6 +17,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.security.cert.X509Certificate;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
 import org.eclipse.swt.widgets.Text;
@@ -38,6 +50,7 @@ public class CompositeAPIUtils {
 		storeUrl = url;
 		username = username1;
 		password = password1;
+		setTrustore();
 		Map<String, String> dataMap = registerOAuthApplication(url, username, password);
 		String accessToken = generateOAuthAccessToken("apim:api_view", dataMap, url, username, password);
 		
@@ -327,4 +340,50 @@ public class CompositeAPIUtils {
 
         return ignored1;
     }
+	
+	private static void setTrustore(){
+		SSLContext sc = null;
+		try {
+			sc = SSLContext.getInstance("SSL");
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        // Create empty HostnameVerifier
+        HostnameVerifier hv = new HostnameVerifier() {
+            public boolean verify(String arg0, SSLSession arg1) {
+                return true;
+            }
+        };
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+			@Override
+			public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+					throws CertificateException {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+        } };
+        try {
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	}
 }

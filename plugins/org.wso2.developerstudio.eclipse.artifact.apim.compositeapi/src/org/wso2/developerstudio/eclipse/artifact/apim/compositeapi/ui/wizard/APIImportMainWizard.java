@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 
 import org.wso2.developerstudio.eclipse.utils.file.FileUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -30,10 +31,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.ImportStoreApiRequest;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.API;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeAPIUtils;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
@@ -53,6 +57,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	//private ImportRemoveSelectionWizardPage selectionPage;
 	private static final String DIR_DOT_METADATA = ".metadata";
 	private static final String DIR_CONNECTORS = ".Connectors";
+	private IEventBroker importStoreApiEB;
 
 	//private static IDeveloperStudioLog log = Logger.getLog(Activator.PLUGIN_ID);
 
@@ -101,6 +106,16 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	 */
     private boolean performFinishStore() {
     	
+    	IProject selectedProject = null;
+		if (importWizardPage.getSelectedProject() == null) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			IWorkbenchPage page = window.getActivePage();
+			selectedProject = page.getActiveEditor().getEditorInput().getAdapter(IFile.class).getProject();
+			
+		} else {
+			selectedProject = importWizardPage.getSelectedProject();
+		}
+    	
         final List<API> selectedAPIs = new ArrayList<>();
         for (TableItem tableItem : importWizardPage.getTable().getItems()) {
             if (tableItem.getChecked()) {
@@ -111,7 +126,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
         //Adding imported APIs to the project
         for (API api : selectedAPIs){
         	String content = CompositeAPIUtils.getApiSwaggerDefinition(api.getId());
-        	File destFile = new File(importWizardPage.getSelectedProject().getFolder("src").getFolder("main").getFolder("Primary APIs").getLocation().toFile(),
+        	File destFile = new File(selectedProject.getFolder("src").getFolder("main").getFolder("Primary APIs").getLocation().toFile(),
                     api.getName() + "-" + api.getVersion() + ".yaml");
             try {
 				FileUtils.createFile(destFile, content);
@@ -123,11 +138,18 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
         
         //Refresh project is required to make added files visible
         try {
-			importWizardPage.getSelectedProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        	selectedProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
+        if (importStoreApiEB == null) {
+        	importStoreApiEB = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        }
+        importStoreApiEB.send("importStoreApi",
+                new ImportStoreApiRequest());
+        
         return true;
     }
 	
@@ -213,6 +235,7 @@ public class APIImportMainWizard extends AbstractWSO2ProjectCreationWizard {
 	//}
 
 	private boolean downloadConnectorAndUpdateProjects(String downloadLink) {
+		
 		String zipDestination = null;
 		try {
 			URL url = new URL(downloadLink);

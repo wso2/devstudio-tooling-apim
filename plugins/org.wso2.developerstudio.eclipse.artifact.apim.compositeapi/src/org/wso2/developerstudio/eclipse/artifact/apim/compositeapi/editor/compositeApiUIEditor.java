@@ -12,10 +12,12 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -24,38 +26,63 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IGotoMarker;
+import org.eclipse.ui.internal.Workbench;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.Activator;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.API;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.Model;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.Resource;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.TreeMember;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.UriTemplate;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.AddResourceRequest;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.ImportStoreApiRequest;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.utils.CompositeApiSwaggerParser;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard.APIImportMainWizard;
+import org.eclipse.swt.widgets.Label;
 
-public class compositeApiUIEditor extends ApplicationWindow implements EventHandler{
+public class compositeApiUIEditor extends ApplicationWindow implements EventHandler {
 	private IEventBroker addResourceEB;
 	protected TreeViewer treeViewer, treeViewer_1;
 	protected Text text;
 	protected TreeMemberLabelProvider labelProvider;
+	protected GridData gridForTreeView;
 	protected Model selectedM1,selectedM2;
+	private IProject currentProject;
+	IResource[] importedAPIs;
+	private Composite composite1;
+	private static final String PROJECT_EXPLORER_PARTID = "org.eclipse.ui.navigator.ProjectExplorer";
 	
-	public compositeApiUIEditor() {
+	public compositeApiUIEditor(IProject project) {
 	    super(null);
+	    currentProject = project;
 	    addResourceEB = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
 	    addResourceEB.subscribe("newAPIResource", this);
+	    addResourceEB.subscribe("importStoreApi", this);
 	  }
 	
 	/*public static void main(String[] args) {
@@ -91,18 +118,31 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	
 	@PostConstruct
 	public Control createContents(Composite parent) {
+		composite1 = parent;
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(4, false));
+		
+		Link changeWorkspaceSettingsLink = createLink(composite, "Import APIs from store");
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
 		
 		
 		
 		treeViewer = new TreeViewer(composite, SWT.BORDER);
 		treeViewer.setContentProvider(new TreeMemberContentProvider());
 		treeViewer.setLabelProvider(new TreeMemberLabelProvider());
-		treeViewer.setInput(getInitalInput());
-		treeViewer.expandAll();
 		Tree tree = treeViewer.getTree();
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 8));
+		gridForTreeView = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 8);
+		tree.setLayoutData(gridForTreeView);
+		if (isAPIsAvailableforComposing()){
+			treeViewer.setInput(getInitalInput(parent));
+			treeViewer.expandAll();
+		} else {
+			treeViewer.setInput(getNoApiInitalInput());
+		}
+		
+		
 		
 		Button button = new Button(composite, SWT.NONE);
 		button.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 8));
@@ -163,6 +203,17 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 			}
 		});
 		btnNewButton_2.setText("Remove");
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		
+		//Link changeWorkspaceSettingsLink = createLink(composite, "Import APIs from store"); 
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		
 		
 		connectListeners();
 		
@@ -199,9 +250,32 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		
 	  }
 
-	public TreeMember getInitalInput() {
+	private TreeMember getNoApiInitalInput() {
 		root = new TreeMember();
-		TreeMember api1 = new TreeMember("test1");
+		root.add(new TreeMember("No APIs imported"));
+		return root;
+		
+	}
+
+	public TreeMember getInitalInput(Composite composite) {
+		root = new TreeMember();
+		//loop for all imported swaggers
+		//api[1] is swagger.getbasepath()
+		
+		// check if there are apis in Primary APIs folder
+		// if yes call below to add them
+		//else show import API wizard link in the ui
+		for (IResource api : importedAPIs) {
+			String apiLocation = api.getLocation().toString();
+			root.add(CompositeApiSwaggerParser.parseApiTreefromSwagger(apiLocation));
+		}
+		
+			
+		
+		
+		
+		
+		/*TreeMember api1 = new TreeMember("test1");
 		TreeMember api2 = new TreeMember("test2");
 		TreeMember temp1 = new TreeMember("/test1");
 		TreeMember temp2 = new TreeMember("/test2");
@@ -221,11 +295,25 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		temp2.add(new Resource("PUT /test2", "", ""));
 		temp2.add(new Resource("DELETE /test2", "", ""));
 		temp3.add(new Resource("GET /test3", "", ""));
-		temp3.add(new Resource("POST /test3", "", ""));
+		temp3.add(new Resource("POST /test3", "", ""));*/
 		
 		return root;
 	}
 	
+	private boolean isAPIsAvailableforComposing() {   
+		try {
+			importedAPIs = currentProject.getFolder("src").getFolder("main").getFolder("Primary APIs").members();
+			if (importedAPIs.length != 0) {
+				return true;
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
 	public TreeMember getInitalInput1() {
 		root = new TreeMember();
 		TreeMember compAPI = new TreeMember("CompAPI");
@@ -340,87 +428,6 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		  refresh(treeViewer_1);
 	  } 
 	   
-	  /* 
-	   * Fetch the indicies (into the "currentMembers" member) of the selected items. 
-	   * For example, if the user selects the 2nd and 4th items in the list, 
-	   * our array should be [2, 4]. To do this, we need to convert the ITreeSelection 
-	   * that Eclipse gives us into a sorted array of indicies. 
-	   */ 
-	  /*ArrayList<Integer> selectedTopLevelIndicies = new ArrayList<Integer>(); 
-	  ArrayList<Model> selectedMembers = new ArrayList<Model>(); 
-	  Iterator<Object> iter = selection.iterator(); 
-	  int i = 0; 
-	  while (iter.hasNext()) { 
-	   Object element = iter.next(); 
-	   if (element instanceof Model) { 
-		   Model member = (Model)element; 
-	    if (member.level == 0) { 
-	     selectedTopLevelIndicies.add(member.seq); 
-	     i++; 
-	    } 
-	    selectedMembers.add(member); 
-	   } 
-	  } 
-	   
-	   convert from ArrayList<Integer> to sorted Integer[]  
-	  Integer selectedIndicies[] = new Integer[i]; 
-	  selectedTopLevelIndicies.toArray(selectedIndicies); 
-	  Arrays.sort(selectedIndicies); 
-	   
-	   
-	   * if our first item is at 0, and we're moving up, or our last item is at listSize -1,  
-	   * and we're moving down, there's nothing to do. We can't move beyond the bounds of 
-	   * the list. 
-	    
-	  int currentMemberSize = currentMembers.size(); 
-	  if (((direction == -1) && (selectedIndicies[0] == 0)) || 
-	   ((direction == 1) && (selectedIndicies[selectedIndicies.length - 1] == (currentMemberSize - 1)))) { 
-	   return; 
-	  } 
-	 
-	  
-	   * The direction in which we're moving the files will dictate the order in which 
-	   * we must traverse the list of files (if we go the wrong direction, list items 
-	   * will "leapfrog" their neighbours, even if their neighbours are also moving. 
-	    
-	  int firstIndex, lastIndex; 
-	  if (direction == 1) { 
-	   firstIndex = selectedIndicies.length - 1; 
-	   lastIndex = -1; 
-	  } else { 
-	   firstIndex = 0; 
-	   lastIndex = selectedIndicies.length; 
-	  } 
-	   
-	  
-	   * Now we actually modify the content of "currentMembers". Starting at position 
-	   * 'firstIndex', and decrementing by 'direction' until we reach 'lastIndex'. 
-	    
-	  int pos = firstIndex; 
-	  while (pos != lastIndex) { 
-	   int index = selectedIndicies[pos]; 
-	   int id = currentMembers.get(index); 
-	    
-	    shuffle the item along  
-	   currentMembers.remove(index); 
-	   currentMembers.add(index + direction, id); 
-	    
-	    move to next selected file  
-	   pos -= direction; 
-	  } 
-	   
-	   redraw the tree with the modified content  
-	  populateList(filesList); 
-	   
-	   
-	   * Reset the selection so that the same elements are selected in the new tree. Naturaly 
-	   * their sequence numbers have now changed. 
-	    
-	  for (TreeMember member: selectedMembers) { 
-	   member.seq += direction; 
-	  } 
-	  StructuredSelection newSelection = new StructuredSelection(selectedMembers); 
-	  filesList.setSelection(newSelection, true); */
 	 } 
 	 
 	 /**
@@ -450,6 +457,28 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
   	 refresh(treeViewer_1); 
 		 
 	 }
+	 
+	 private Link createLink(Composite composite, String text) { 
+	        Link link= new Link(composite, SWT.NONE); 
+	        link.setFont(composite.getFont()); 
+	        link.setText("<A>" + text + "</A>");  //$NON-NLS-1$//$NON-NLS-2$ 
+	        link.addSelectionListener(new SelectionListener() { 
+	            public void widgetSelected(SelectionEvent e) { 
+	                openLink(); 
+	            } 
+	            public void widgetDefaultSelected(SelectionEvent e) { 
+	                openLink(); 
+	            } 
+	        }); 
+	        return link; 
+	    } 
+	 
+	    private void openLink() { 
+	    	APIImportMainWizard wizard = new APIImportMainWizard();
+			WizardDialog exportWizardDialog = new WizardDialog(PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getShell(), wizard);
+			exportWizardDialog.open();
+	    } 
 
 	@Override
 	public void handleEvent(org.osgi.service.event.Event brokerEvent) {
@@ -476,6 +505,8 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	         	   }
 	         	   receivingItem.add(temp1);
 	         	  refresh(treeViewer_1);  
+	            } else if (eventObject instanceof ImportStoreApiRequest) {
+	            	createContents(composite1);
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();

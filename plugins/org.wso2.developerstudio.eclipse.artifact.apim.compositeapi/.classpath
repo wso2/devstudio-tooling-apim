@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.6.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.5.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackson-dataformat-yaml-2.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swagger-parser-1.0.20-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json_2.0.0.wso2v1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/snakeyaml-1.13.jar"/>
+	<classpathentry kind="lib" path="/Users/thilinicooray/gitrepo/CompositeAPIImpl/devStudio/src/apim-tooling/devstudio-tooling-apim/plugins/org.wso2.developerstudio.eclipse.artifact.apim.compositeapi/lib/swagger-parser-1.0.20-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/swagger-core-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/swagger-models-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.4.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
