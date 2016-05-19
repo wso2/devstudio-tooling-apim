@@ -196,7 +196,7 @@ public class CompositeApiProjectCreationWizard extends
 			String path = swaggerFile.getParent().getFullPath() + "/";
 			String source = FileUtils.getContentAsString(file);
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		    IWorkbenchPage page = window.getActivePage();
+			IWorkbenchPage page = window.getActivePage();
 			IEditorDescriptor desc = PlatformUI.getWorkbench().
 			        getEditorRegistry().getDefaultEditor(file.getName());
 			page.openEditor(new FileEditorInput(swaggerFile), desc.getId());
