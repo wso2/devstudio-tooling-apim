@@ -26,6 +26,12 @@ import org.wso2.developerstudio.eclipse.platform.ui.startup.ESBGraphicalEditor;
 import org.wso2.developerstudio.eclipse.platform.ui.wizard.AbstractWSO2ProjectCreationWizard;
 import org.wso2.developerstudio.eclipse.utils.file.FileUtils;
 import org.wso2.developerstudio.eclipse.utils.project.ProjectUtils;
+
+import io.swagger.models.Info;
+import io.swagger.models.Swagger;
+import io.swagger.util.Json;
+import io.swagger.util.Yaml;
+
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.model.CompositeApiModel;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiConstants;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.utils.CompositeApiImageUtils;
@@ -64,7 +70,7 @@ public class CompositeApiProjectCreationWizard extends
 			MavenUtils.updateWithMavenEclipsePlugin(pomfile,new String[] { },new String[] {CompositeApiConstants.PROJECT_NATURE});
 			
 			//Add definition files to the project
-			addAPIDefinitionstoProject("api_definition.yaml", compositeApiModel.getCompositeApiProjectName() + ".yaml");
+			addInitialSwaggerDefinition(compositeApiModel.getCompositeApiProjectName() + ".yaml");
 			addAPIDefinitionstoProject("composite_api.iflow",compositeApiModel.getCompositeApiProjectName() + ".iflow");
 			
 			swaggerFile = compositeAPIProject.getFolder("src").getFolder("main").getFile(new Path(compositeApiModel.getCompositeApiProjectName() + ".yaml"));
@@ -165,7 +171,7 @@ public class CompositeApiProjectCreationWizard extends
 		return compositeAPIProject;
 	}
 	
-	private void addAPIDefinitionstoProject(String templateName, String fileName){
+	private void addAPIDefinitionstoProject(String templateName, String fileName) {
 		File compositeApiTemplateFile;
 		File destFile = new File(compositeAPIProject.getFolder("src").getFolder("main").getLocation().toFile(),
                 fileName);
@@ -175,6 +181,24 @@ public class CompositeApiProjectCreationWizard extends
              
              String templateContent = FileUtils.getContentAsString(compositeApiTemplateFile);
              FileUtils.createFile(destFile, templateContent);
+             fileList.add(destFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void addInitialSwaggerDefinition (String fileName) {
+		File destFile = new File(compositeAPIProject.getFolder("src").getFolder("main").getLocation().toFile(),
+                fileName);
+        try {
+        	Swagger swagger = new Swagger();
+        	Info info = new Info();
+        	info.setTitle(compositeAPIProject.getName());
+        	swagger.setInfo(info);
+        	
+        	String swaggerContent = Yaml.pretty().writeValueAsString(swagger);;
+             FileUtils.createFile(destFile, swaggerContent);
              fileList.add(destFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

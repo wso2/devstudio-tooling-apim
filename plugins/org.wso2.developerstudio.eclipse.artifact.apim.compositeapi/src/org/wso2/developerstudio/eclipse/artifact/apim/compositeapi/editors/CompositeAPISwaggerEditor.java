@@ -13,11 +13,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -37,6 +40,7 @@ import org.eclipse.ui.*;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.ide.IDE;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.GraphicalEditorPart;
 
@@ -49,10 +53,11 @@ import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Graphi
  * <li>page 2 shows the words in page 0 in sorted order
  * </ul>
  */
-public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IResourceChangeListener{
+public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
 	/** The text editor used in page 0. */
-	private GraphicalEditorPart editor;
+	private GraphicalEditorPart graphicalEditor;
+	private TextEditor sourceEditor;
 
 	/** The font chosen in page 1. */
 	private Font font;
@@ -64,7 +69,7 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 	 */
 	public CompositeAPISwaggerEditor() {
 		super();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+		//ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
 	/**
 	 * Creates page 0 of the multi-page editor,
@@ -72,8 +77,8 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 	 */
 	void createPage0() {
 		try {
-			editor = new GraphicalEditorPart();
-			int index = addPage(editor, getEditorInput());
+			graphicalEditor = new GraphicalEditorPart();
+			int index = addPage(graphicalEditor, getEditorInput());
 			setPageText(index, "Design");
 		} catch (PartInitException e) {
 			ErrorDialog.openError(
@@ -88,27 +93,19 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 	 * which allows you to change the font used in page 2.
 	 */
 	void createPage1() {
-		//should open the yaml file in yedit
-		
-		Composite composite = new Composite(getContainer(), SWT.NONE);
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-		layout.numColumns = 2;
+		sourceEditor = new TextEditor();
+        int editorIndex;
+		try {
+			editorIndex = addPage(sourceEditor, getEditorInput());
+			setPageText(editorIndex, "Source");
+		} catch (PartInitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 
-		Button fontButton = new Button(composite, SWT.NONE);
-		GridData gd = new GridData(GridData.BEGINNING);
-		gd.horizontalSpan = 2;
-		fontButton.setLayoutData(gd);
-		fontButton.setText("Change Font...");
-		
-		fontButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				setFont();
-			}
-		});
-
-		int index = addPage(composite);
-		setPageText(index, "Source");
+		//int index = addPage(composite);
+		//setPageText(index, "Source");
 	}
 	
 	/**
@@ -127,11 +124,18 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 		super.dispose();
 	}
+	
 	/**
 	 * Saves the multi-page editor's document.
 	 */
 	public void doSave(IProgressMonitor monitor) {
-		getEditor(0).doSave(monitor);
+		sourceEditor.doSave(monitor);
+		updateDirtyState();
+	}
+	
+	private void updateDirtyState() {
+		graphicalEditor.setDirty(false);
+		//firePropertyChange(PROP_DIRTY);
 	}
 	/**
 	 * Saves the multi-page editor's document as another file.
@@ -160,6 +164,7 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 		if (!(editorInput instanceof IFileEditorInput))
 			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
 		super.init(site, editorInput);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		String name = editorInput.getName();
 	    setTitle(name);
 	}
@@ -185,13 +190,17 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 				public void run(){
 					IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
 					for (int i = 0; i<pages.length; i++){
-						if(((FileEditorInput)editor.getEditorInput()).getFile().getProject().equals(event.getResource())){
-							IEditorPart editorPart = pages[i].findEditor(editor.getEditorInput());
+						if(((FileEditorInput)graphicalEditor.getEditorInput()).getFile().getProject().equals(event.getResource())){
+							IEditorPart editorPart = pages[i].findEditor(graphicalEditor.getEditorInput());
 							pages[i].closeEditor(editorPart,true);
 						}
 					}
 				}            
 			});
+		} else if (event.getType() == IResourceChangeEvent.POST_CHANGE){
+			IResource changedResource = event.getResource();
+			
+			
 		}
 	}
 	/**
@@ -208,5 +217,12 @@ public class CompositeAPISwaggerEditor extends MultiPageEditorPart implements IR
 			text.setFont(font);
 		}
 	}
+	
+	@Override
+	public boolean isDirty() {
+		return this.sourceEditor.isDirty() || this.graphicalEditor.isDirty();
+	}
+	
+	 
 	
 }
