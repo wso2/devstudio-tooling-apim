@@ -128,7 +128,7 @@ public class CompositeAPIUtils {
         String dcrEndpointURL = keyMangerUrl + "/client-registration/v0.9/register";
 
         //use a random name for client to avoid conflicts in application(s)
-        String randomClientName = RandomStringUtils.randomAlphabetic(5);
+        String randomClientName = RandomStringUtils.randomAlphanumeric(6);
         String applicationRequestBody = "{\n" +
                 "\"callbackUrl\": \"www.google.lk\",\n" +
                 "\"clientName\": \"" + randomClientName + "\",\n" +

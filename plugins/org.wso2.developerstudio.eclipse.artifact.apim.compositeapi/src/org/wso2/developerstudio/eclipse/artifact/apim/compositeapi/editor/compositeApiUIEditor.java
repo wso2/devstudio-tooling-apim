@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -49,6 +50,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IGotoMarker;
@@ -61,6 +63,7 @@ import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.Models.UriTemplate;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.AddResourceRequest;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.internal.communication.ImportStoreApiRequest;
+import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.utils.CompositeApiSwaggerGenerator;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.editor.utils.CompositeApiSwaggerParser;
 import org.wso2.developerstudio.eclipse.artifact.apim.compositeapi.ui.wizard.APIImportMainWizard;
 import org.eclipse.swt.widgets.Label;
@@ -76,7 +79,16 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	IResource[] importedAPIs;
 	private Composite composite1;
 	private static final String PROJECT_EXPLORER_PARTID = "org.eclipse.ui.navigator.ProjectExplorer";
+	private boolean isEditorModified = false;
 	
+	public boolean isEditorModified() {
+		return isEditorModified;
+	}
+	
+	public void setIsEditorModified(boolean isModified ) {
+		isEditorModified = isModified;
+	}
+
 	public compositeApiUIEditor(IProject project) {
 	    super(null);
 	    currentProject = project;
@@ -97,7 +109,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	    open();
 
 	    // Dispose the display
-	    Display.getCurrent().dispose();
+	    //Display.getCurrent().dispose();
 	  }
 
 	  /**
@@ -136,7 +148,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		gridForTreeView = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 8);
 		tree.setLayoutData(gridForTreeView);
 		if (isAPIsAvailableforComposing()){
-			treeViewer.setInput(getInitalInput(parent));
+			treeViewer.setInput(getInitalInput());
 			treeViewer.expandAll();
 		} else {
 			treeViewer.setInput(getNoApiInitalInput());
@@ -200,6 +212,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 					parent.remove(model);
 				}
 				refresh(treeViewer_1);
+				isEditorModified = true;
 			}
 		});
 		btnNewButton_2.setText("Remove");
@@ -237,7 +250,7 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		        	   }
 		        	   receivingItem.add(selectedM1);
 		        	   refresh(treeViewer_1);
-		        	  
+		        	   isEditorModified = true;
 		        	 // treeViewer_1.add(selectedM2, selectedM1);
 		        	  //treeViewer_1.refresh();
 		        	  //treeViewer_1.getComparator().
@@ -257,10 +270,18 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		
 	}
 
-	public TreeMember getInitalInput(Composite composite) {
+	public TreeMember getInitalInput() {
 		root = new TreeMember();
 		//loop for all imported swaggers
 		//api[1] is swagger.getbasepath()
+		
+			try {
+				importedAPIs = currentProject.getFolder("src").getFolder("main").getFolder("Primary APIs").members();
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 		
 		// check if there are apis in Primary APIs folder
 		// if yes call below to add them
@@ -316,8 +337,10 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 
 	public TreeMember getInitalInput1() {
 		root = new TreeMember();
-		TreeMember compAPI = new TreeMember("CompAPI");
-		root.add(compAPI);		
+		//TreeMember compAPI = new TreeMember("CompAPI");
+		String apiLocation = currentProject.getFolder("src").getFolder("main").getFile(currentProject.getName() + ".yaml").getLocation().toString();
+		root.add(CompositeApiSwaggerParser.parseApiTreefromSwagger(apiLocation));
+		//root.add(compAPI);		
 		return root;
 	}
 	
@@ -426,7 +449,9 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 		  int currentItemPosition = selectedItemParentsChildren.indexOf(selectedObject);
 		  Collections.swap(selectedItemParentsChildren, currentItemPosition, currentItemPosition + 1);
 		  refresh(treeViewer_1);
-	  } 
+	  }
+	  
+	  isEditorModified = true;
 	   
 	 } 
 	 
@@ -504,14 +529,17 @@ public class compositeApiUIEditor extends ApplicationWindow implements EventHand
 	         	       }
 	         	   }
 	         	   receivingItem.add(temp1);
+	         	  isEditorModified = true;
+	         	  CompositeApiSwaggerGenerator.addNewResource(request.getUriTemplate(), request.getVerbs());
+	         	   
 	         	  refresh(treeViewer_1);  
 	            } else if (eventObject instanceof ImportStoreApiRequest) {
-	            	createContents(composite1);
+	            	treeViewer.setInput(getInitalInput());
+	            	refresh(treeViewer);
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
-		
 	}
 	
 	private void refresh(TreeViewer treeViewer) {

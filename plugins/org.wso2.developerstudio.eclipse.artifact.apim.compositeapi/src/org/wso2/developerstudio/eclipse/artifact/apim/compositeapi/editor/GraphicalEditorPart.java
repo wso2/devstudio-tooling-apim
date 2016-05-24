@@ -23,12 +23,13 @@ import org.eclipse.ui.part.EditorPart;
 public class GraphicalEditorPart extends EditorPart {
 	
 	private IProject currentProject;
+	compositeApiUIEditor editor;
 
 	@Override
 	public void doSave(IProgressMonitor arg0) {
-		// TODO Auto-generated method stub
+		setDirty(false);
 		
-	}
+	} 
 
 	@Override
 	public void doSaveAs() {
@@ -47,9 +48,15 @@ public class GraphicalEditorPart extends EditorPart {
 
 	@Override
 	public boolean isDirty() {
-		// TODO Auto-generated method stub
-		return false;
+		return editor.isEditorModified();
+		
 	}
+	
+	public void setDirty(boolean value)
+    {
+        editor.setIsEditorModified(value);
+        firePropertyChange(PROP_DIRTY);
+    }
 
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -59,7 +66,7 @@ public class GraphicalEditorPart extends EditorPart {
 
 	@Override
 	public void createPartControl(Composite composite) {
-		compositeApiUIEditor editor = new compositeApiUIEditor(currentProject);
+		editor= new compositeApiUIEditor(currentProject);
 		editor.createContents(composite);
 		
 	}
