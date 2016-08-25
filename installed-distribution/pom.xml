@@ -60,7 +60,7 @@
     </modules>
     <build>
 		<plugins>
-			<plugin>
+			<!--plugin>
 				<artifactId>exec-maven-plugin</artifactId>
 				<groupId>org.codehaus.mojo</groupId>
 				<executions>
@@ -75,7 +75,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin-->
 		</plugins>
 	</build>        
 </project>
